@@ -1,0 +1,73 @@
+
+
+# Documento de Arquitectura: Plataforma VivaEventos
+
+## 1. Introducción  
+Este documento describe la arquitectura inicial del sistema de gestión de eventos y venta de boletas digitales de la plataforma **VivaEventos**, incluyendo los requisitos funcionales, requisitos de calidad y restricciones que deben considerarse durante el diseño e implementación del software.
+
+El objetivo del sistema es permitir la publicación de eventos, la venta de boletas digitales con código QR, la integración con pasarelas de pago, la validación de acceso a los eventos y el monitoreo de ventas en tiempo real.
+
+**Equipo:** Los Inhackeables1
+
+**Integrantes:**
+
+<br>Juan David Ascencio - 2359660-3743
+<br>Geraldine Florez - 2269476-3743
+<br>David Stiven Mujanajinsoy - 2376834-3743
+<br>Andrés Felipe Salcedo - 2359304-3743
+
+Fecha: 06/03/2026  
+
+---
+
+## 2. Requisitos Funcionales  
+Los requisitos funcionales se presentan en forma de **historias de usuario**, especificando los **criterios de aceptación**.
+
+| **ID**    | **Historia de Usuario**                                                                                                                                                         | **Criterios de Aceptación**                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | **INVEST**                                                                                                                                                                                                                                                                                                                                       |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **US-01** | **Como organizador de eventos quiero crear y publicar un evento con su información y número de boletas disponibles para permitir que los usuarios compren entradas al evento.** | • Dado que el organizador está autenticado cuando crea un evento entonces el sistema debe permitir registrar nombre, fecha, ubicación, descripción y número de boletas.<br><br>• Dado que el evento fue creado correctamente cuando el organizador decide publicarlo entonces el sistema debe hacerlo visible para los clientes.<br><br>• Dado que el organizador define un número máximo de boletas cuando los clientes realizan compras entonces el sistema no debe permitir vender más boletas que el aforo definido.<br><br>• Dado que se intenta crear un evento con datos incompletos cuando se guarda la información entonces el sistema debe rechazar la operación. | **Cumple INVEST**.<br>• **Independent:** no depende del módulo de pagos.<br>• **Negotiable:** se pueden agregar más atributos al evento.<br>•**Valuable**: permite publicar eventos para vender entradas.<br>• **Estimable**: el alcance técnico es claro.<br>• **Small:** se limita a la creación y publicación del evento.<br>• **Testable:** se puede verificar creando eventos. |
+| **US-02** | **Como cliente quiero consultar la lista de eventos disponibles para decidir a cuál evento asistir.**                                                                           | • Dado que existen eventos publicados cuando el cliente consulta la lista entonces el sistema debe mostrar nombre, fecha, ubicación y precio.<br><br>• Dado que un evento está activo cuando se consulta entonces debe mostrarse disponible.<br><br>• Dado que un evento fue cancelado cuando el cliente consulta entonces no debe aparecer disponible.<br><br>• Dado que un usuario no autenticado accede al sistema cuando consulta eventos entonces debe poder visualizar la información.                                                                                                                                                                                | **Cumple INVEST**.<br>• **Independent:** no depende del proceso de compra.<br>• **Negotiable:** se pueden agregar filtros.<br>•**Valuable** permite al cliente conocer eventos disponibles.<br>• **Estimable** consulta simple de información.<br>• **Small:** solo visualización.<br>• **Testable:** verificable consultando eventos.                                            |
+| **US-03** | **Como cliente quiero seleccionar el tipo de boleta y la cantidad que deseo comprar para adquirir entradas al evento.**                                                         | • Dado que el cliente selecciona un evento cuando entra al detalle entonces el sistema debe mostrar tipos de boleta disponibles (General, VIP, etc.).<br><br>• Dado que el cliente selecciona una cantidad válida cuando intenta comprar entonces el sistema debe validar disponibilidad.<br><br>• Dado que el cliente intenta comprar más boletas de las disponibles cuando confirma la selección entonces el sistema debe rechazar la operación.<br><br>• Dado que la selección es válida cuando el cliente confirma entonces el sistema debe generar una orden en estado **Pendiente de pago**.                                                                          | **Cumple INVEST**.<br>• **Independent:** no depende de notificaciones.<br>• **Negotiable:** tipos de boleta pueden cambiar.<br>• **Valuable** inicia el proceso de compra.<br>• **Estimable** flujo técnico claro.<br>• **Small:** solo selección de boletas.<br>• **Testable:** validación de disponibilidad verificable.                                                         |
+| **US-04** | **Como cliente quiero pagar mi orden mediante una pasarela de pagos para confirmar la compra de mis boletas.**                                                                  | • Dado que existe una orden pendiente cuando el cliente paga entonces el sistema debe redirigir a la pasarela de pago.<br><br>• Dado que el pago es aprobado cuando la pasarela confirma entonces la orden debe cambiar a estado **Pagado**.<br><br>• Dado que el pago es rechazado cuando la pasarela responde entonces la orden debe cambiar a **Rechazado**.<br><br>• Dado que el pago queda pendiente cuando la pasarela envía confirmación posterior entonces el sistema debe actualizar el estado automáticamente.                                                                                                                                                    | **Cumple INVEST**.<br>• **Independent:** puede implementarse sin notificaciones.<br>• **Negotiable:** la pasarela puede cambiar.<br>• **Valuable** permite completar la compra.<br>• **Estimable** integración técnica clara.<br>• **Small:** solo proceso de pago.<br>• **Testable:** estados verificables.                                                                       |
+| **US-05** | **Como sistema quiero generar una boleta digital con código QR después de confirmar el pago para permitir el ingreso al evento.**                                               | • Dado que el pago fue aprobado cuando el sistema confirma la orden entonces debe generar una boleta digital con QR.<br><br>• Dado que la boleta fue generada cuando el cliente consulta su compra entonces debe poder visualizarla o descargarla.<br><br>• Dado que la boleta es generada cuando se completa la compra entonces el sistema debe enviarla por correo electrónico.<br><br>• Dado que se crea una boleta cuando se almacena en el sistema entonces debe tener un identificador único.                                                                                                                                                                         | **Cumple INVEST**.<br>•  **Independent:** no depende del módulo de validación.<br>• **Negotiable:** el formato de la boleta puede cambiar.<br>• **Valuable** permite acceso al evento.<br>• **Estimable** generación de QR clara.<br>• **Small:** solo generación de boleta.<br>• **Testable:** se puede probar escaneando el QR.                                                   |
+| **US-06** | **Como personal de logística quiero escanear el código QR de las boletas para validar el ingreso de los asistentes al evento.**                                                 | • Dado que el personal escanea una boleta cuando el QR es enviado al sistema entonces el sistema debe verificar que exista.<br><br>• Dado que la boleta es válida cuando se valida entonces el sistema debe marcarla como **Usada** y permitir el ingreso.<br><br>• Dado que la boleta ya fue utilizada cuando se intenta escanear nuevamente entonces el sistema debe rechazar el acceso.<br><br>• Dado que la validación es exitosa cuando se registra el ingreso entonces debe guardarse fecha y hora.                                                                                                                                                                   | **Cumple INVEST**.<br>• **Independent:** no depende del módulo de ventas.<br>• **Negotiable:** se puede mejorar validación offline.<br>• **Valuable** evita fraude y reventa.<br>• **Estimable** flujo claro de validación.<br>• **Small:** solo validación de acceso.<br>• **Testable:** verificable con boletas válidas e inválidas.                                             |
+
+
+>  **Instrucciones:**  
+> - Completar al menos **6 historias de usuario**.  
+> - Asegurar que cada historia tenga criterios de aceptación claros y verificables.  
+
+---
+
+## 3. Requisitos de Calidad  
+Los requisitos de calidad se presentan en forma de **historias de calidad**, siguiendo la estructura de Len Bass.
+
+### **Historias de Calidad**
+| **ID**    | **Fuente**         | **Estímulo**         | **Artefactos**         | **Entorno**         | **Respuesta**         | **Medida de Respuesta**         |
+| --------- | ------------------ | -------------------- | ---------------------- | ------------------- | --------------------- | ------------------------------- |
+| **RQ-01** | _[Agregar fuente]_ | _[Agregar estímulo]_ | _[Agregar artefactos]_ | _[Agregar entorno]_ | _[Agregar respuesta]_ | _[Agregar medida de respuesta]_ |
+| **RQ-02** | _[Agregar fuente]_ | _[Agregar estímulo]_ | _[Agregar artefactos]_ | _[Agregar entorno]_ | _[Agregar respuesta]_ | _[Agregar medida de respuesta]_ |
+| **RQ-03** | _[Agregar fuente]_ | _[Agregar estímulo]_ | _[Agregar artefactos]_ | _[Agregar entorno]_ | _[Agregar respuesta]_ | _[Agregar medida de respuesta]_ |
+
+>  **Instrucciones:**  
+> - Completar al menos **6 historias de calidad**, alineadas con atributos clave como **rendimiento, escalabilidad y seguridad**.  
+> - Definir cómo se medirá la respuesta esperada ante la situación planteada.  
+
+---
+
+## 4. Restricciones del Sistema  
+Las restricciones establecen **limitaciones** en la arquitectura del sistema, ya sean tecnológicas, de negocio, regulatorias o de infraestructura.
+
+### **Lista de Restricciones**
+| **Tipo de Restricción** | **Descripción**                                                                                                                                                          |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| _[Agregar otro tipo]_   | _[Describir la restricción]_                                                                                                                                             |
+
+>  **Tipos de restricciones:**  
+> - **Tecnológicas:** Lenguajes, frameworks o herramientas que deben utilizarse.  
+> - **De negocio:** Normativas o estándares de la empresa.  
+> - **Regulatorias:** Cumplimiento de normativas legales o de seguridad.  
+> - **De infraestructura:** Limitaciones en hardware, red o almacenamiento.  
+
+
+
