@@ -76,8 +76,9 @@ Las restricciones establecen **limitaciones** en la arquitectura del sistema, ya
 | **R-10** | **Trazabilidad / Auditoría**         | El sistema debe registrar **trazabilidad completa de las acciones del sistema**, incluyendo órdenes, pagos, generación de tickets y notificaciones.     | “Necesito poder reconstruir qué pasó… **este usuario creó la orden, se intentó pagar, luego se confirmó**.”       |
 | **R-11** | **Operación / Validación de acceso** | La validación de boletas mediante QR debe ser **rápida y eficiente**, incluso en condiciones de conectividad limitada.                                  | “La fila no puede pararse porque el sistema se demoró validando un QR.”                                           |
 | **R-12** | **Negocio / Control de aforo**       | El sistema no debe permitir vender **más boletas de las disponibles para un evento**.                                                                   | “Tampoco puedo permitir que **se vendan más boletas de las que hay**.”                                            |
-                                                                                                                                            
-
+| **R-13** | **Gestión del proyecto / Entrega** | El sistema debe desarrollarse y entregarse de forma incremental, permitiendo demostrar el flujo completo antes de la entrega final. | “Para que esto sea viable en 13 semanas, **yo necesito que ustedes entreguen por partes, no todo al final**.” |                                                                                                                                            
+| **R-14** | **Documentación / Operación** | El repositorio debe incluir documentación que explique cómo levantar el sistema, cómo probarlo y cómo usar los endpoints. | “En el repositorio debe quedar explicado cómo se levanta, cómo se prueba, qué endpoints hay…” |
+| **R-15** | **Alcance / Producto** | El MVP debe enfocarse únicamente en las funcionalidades esenciales del sistema, evitando desarrollar características avanzadas fuera del alcance inicial. | “No estamos construyendo la NASA… No necesito motor de recomendaciones con IA, ni app móvil nativa.” |
 >  **Tipos de restricciones:**  
 > - **Tecnológicas:** Lenguajes, frameworks o herramientas que deben utilizarse.  
 > - **De negocio:** Normativas o estándares de la empresa.  
